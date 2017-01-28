@@ -9,20 +9,20 @@ class UserValidatorTest < Minitest::Test
 
   def test_validate_email
     a = UserValidator.new('homework.csv')
-    assert a.validate_email(a.data[0][3])
-    refute a.validate_email(a.data[1][3])
+    assert a.validate_email(a.data[0]["email"])
+    refute a.validate_email(a.data[1]["email"])
   end
 
   def test_validate_date
     a = UserValidator.new('homework.csv')
-    assert a.validate_date(a.data[0][1])
-    refute a.validate_date(a.data[1][1])
+    assert a.validate_date(a.data[0]["joined"])
+    refute a.validate_date(a.data[1]["joined"])
   end
 
   def test_validate_phone
     a = UserValidator.new('homework.csv')
-    assert a.validate_phone(a.data[0][4])
-    refute a.validate_phone(a.data[4][4])
+    assert a.validate_phone(a.data[0]["phone"])
+    refute a.validate_phone(a.data[4]["phone"])
   end
 
   def test_validate

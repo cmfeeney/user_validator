@@ -3,27 +3,28 @@ require 'csv'
 class UserValidator
   attr_reader :data
   def initialize(filename)
-    @data = CSV.read(filename)
-    #Chop headers row from data file
-    @data = @data[1..-1]
+    @data = []
+    CSV.foreach(filename, headers: true) do |row|
+      @data << row.to_hash
+    end
     @invalid_lines = []
   end
 
   def validate
-    #Counter starts at two because that's the first row number with data after we chopped the headers row (1) off
+    #Counter starts at two because that's the first row number with data
     counter = 2
     valid_count = 0
     data.each do |x|
       #create array with row number
       checker = [counter]
       #check each field and add message to array if not valid
-      if validate_date(x[1].to_s) == nil
+      if validate_date(x["joined"].to_s) == nil
         checker << "Not a valid date"
       end
-      if validate_email(x[3].to_s) == nil
+      if validate_email(x["email"].to_s) == nil
         checker << "Not a valid email address"
       end
-      if validate_phone(x[4].to_s) == nil
+      if validate_phone(x["phone"].to_s) == nil
         checker << "Not a valid phone number"
       end
       counter += 1
