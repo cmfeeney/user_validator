@@ -4,15 +4,19 @@ class UserValidator
   attr_reader :data
   def initialize(filename)
     @data = CSV.read(filename)
+    #Chop headers row from data file
     @data = @data[1..-1]
     @invalid_lines = []
   end
 
   def validate
+    #Counter starts at two because that's the first row number with data after we chopped the headers row (1) off
     counter = 2
     valid_count = 0
     data.each do |x|
+      #create array with row number
       checker = [counter]
+      #check each field and add message to array if not valid
       if validate_date(x[1].to_s) == nil
         checker << "Not a valid date"
       end
@@ -23,14 +27,17 @@ class UserValidator
         checker << "Not a valid phone number"
       end
       counter += 1
+      #if array has more than elements than just row number in it (i.e. error msgs were added), add it to invalid_lines array
       if checker.count > 1
         @invalid_lines << checker
       end
     end
+    #counter subtracts 2 since that's what we started it at
     valid_count = counter - 2 - @invalid_lines.count
     puts "There were #{valid_count} valid lines in the CSV."
     if @invalid_lines.count >= 1
-    puts "The invalid rows with their invalid fields are listed below:"
+    puts "The invalid row numbers with their invalid fields are listed below:"
+    #use inspect to put each element on its own row
     @invalid_lines.each{|e| puts e.inspect}
     end
   end
