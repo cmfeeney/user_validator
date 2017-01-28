@@ -25,8 +25,14 @@ class UserValidatorTest < Minitest::Test
     refute a.validate_phone(a.data[4]["phone"])
   end
 
+  def test_validate_password
+    a = UserValidator.new('homework.csv')
+    assert a.validate_password(a.data[4]["password"])
+    refute a.validate_password(a.data[0]["password"])
+  end
+
   def test_validate
     a = UserValidator.new('sample.csv')
-    assert_equal [[3, "Not a valid email address"]], a.validate
+    assert_equal [[3, "Not a valid email address", "Not a valid password"]], a.validate
   end
 end

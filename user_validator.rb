@@ -27,6 +27,9 @@ class UserValidator
       if validate_phone(x["phone"].to_s) == nil
         checker << "Not a valid phone number"
       end
+      if validate_password(x["password"].to_s) == nil
+        checker << "Not a valid password"
+      end
       counter += 1
       #if array has more than elements than just row number in it (i.e. error msgs were added), add it to invalid_lines array
       if checker.count > 1
@@ -53,6 +56,30 @@ class UserValidator
 
   def validate_phone(value)
     value.match(/^(\(\d{3}\)|\d{3})(-|\.|\s|)\d{3}(-|\.|\s|)\d{4}$/)
+  end
+
+  def validate_password(value)
+    count = 0
+    #password contains a symbol
+    if value.match(/(\!|\@|\#|\$|\%|\^|\&|\*)/)
+      count += 1
+    end
+    #password contains a lowercase letter
+    if value.match(/[a-z]+/)
+      count += 1
+    end
+    #password contains an uppercase letter
+    if value.match(/[A-Z]+/)
+      count += 1
+    end
+    #password contains a number
+    if value.match(/\d+/)
+      count += 1
+    end
+    #password has at least six characters and at least three of the above
+    if value.match(/^.{6,}$/) && count >= 3
+      return true
+    end
   end
 end
 
