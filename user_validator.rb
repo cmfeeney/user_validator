@@ -1,22 +1,20 @@
 require 'csv'
 
 class UserValidator
-  attr_reader :data
+  attr_reader :data, :invalid_lines, :valid_lines
   def initialize(filename)
     @data = []
     CSV.foreach(filename, headers: true) do |row|
       @data << row.to_hash
     end
-    @invalid_lines = []
   end
 
   def validate
-    #Counter starts at two because that's the first row number with data
-    counter = 2
-    valid_count = 0
-    data.each do |x|
+    @invalid_lines = []
+    @valid_lines = []
+    data.each_with_index { |x,index|
       #create array with row number
-      checker = [counter]
+      checker = [index + 2]
       #check each field and add message to array if not valid
       if validate_date(x["joined"].to_s) == nil
         checker << "Not a valid date"
@@ -30,19 +28,20 @@ class UserValidator
       if validate_password(x["password"].to_s) == nil
         checker << "Not a valid password"
       end
-      counter += 1
       #if array has more than elements than just row number in it (i.e. error msgs were added), add it to invalid_lines array
+      #or put it in the valid lines array
       if checker.count > 1
-        @invalid_lines << checker
+        invalid_lines << checker
+      else
+        valid_lines << checker
       end
-    end
-    #counter subtracts 2 since that's what we started it at
-    valid_count = counter - 2 - @invalid_lines.count
-    puts "There were #{valid_count} valid lines in the CSV."
-    if @invalid_lines.count >= 1
-    puts "The invalid row numbers with their invalid fields are listed below:"
-    #use inspect to put each element on its own row
-    @invalid_lines.each{|e| puts e.inspect}
+    }
+
+    puts "There #{valid_lines.count == 1 ? 'was' : 'were'} #{valid_lines.count} valid #{valid_lines.count == 1 ? 'line' : 'lines'} in the CSV."
+    if invalid_lines.count >= 1
+      puts "The invalid row numbers with their invalid fields are listed below:"
+      #use inspect to put each element on its own row
+      invalid_lines.each{|e| puts e.inspect}
     end
   end
 
@@ -51,7 +50,7 @@ class UserValidator
   end
 
   def validate_email(value)
-    value.match(/^.[^@]+@\w[^@]+\.(com|org|net|edu|gov|mil)$/)
+    value.match(/^.[^@]+@\w[^@]+\.(com|org|net|edu|gov|mil|io)$/)
   end
 
   def validate_phone(value)
